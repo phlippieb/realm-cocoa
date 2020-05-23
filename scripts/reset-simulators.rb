@@ -3,6 +3,8 @@
 require 'json'
 require 'open3'
 
+prelaunch_simulator = ARGV[0] || ''
+
 def platform_for_runtime(runtime)
   runtime['identifier'].gsub(/com.apple.CoreSimulator.SimRuntime.([^-]+)-.*/, '\1')
 end
@@ -121,9 +123,15 @@ begin
   end
   puts ' done!'
 
-  print 'Booting iPhone 8 simulator...'
-  system("xcrun simctl boot 'iPhone 8'") or raise "Failed to boot iPhone 8 simulator"
-  puts ' done!'
+  if prelaunch_simulator.include? 'tvos'
+    print 'Booting Apple TV simulator...'
+    system("xcrun simctl boot 'Apple TV'") or raise "Failed to boot Apple TV simulator"
+    puts ' done!'
+  else
+    print 'Booting iPhone 8 simulator...'
+    system("xcrun simctl boot 'iPhone 8'") or raise "Failed to boot iPhone 8 simulator"
+    puts ' done!'
+  end
 
   print 'Waiting for dyld shared cache to update...'
   while system('pgrep -q update_dyld_sim_shared_cache')
